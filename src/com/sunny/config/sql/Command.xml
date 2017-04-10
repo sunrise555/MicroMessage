@@ -28,7 +28,8 @@
     <result column="NAME" jdbcType="VARCHAR" property="name"/>
     <result column="DESCRIPTION" jdbcType="VARCHAR" property="description"/>
     <!-- 使用collection来表示返回的map结果中包含一个子表的集合，和实体类中的contentList相对应 -->
-    <collection property="contentList" ofType="com.sunny.bean.CommandContent"/>
+    <collection property="contentList" ofType="com.sunny.bean.CommandContent" 
+    resultMap="com.sunny.DAO.CommandContentInterface.CommandContentResult"/>
   </resultMap>
 
 	<select id="queryCommandList" parameterType="com.sunny.bean.Command"
