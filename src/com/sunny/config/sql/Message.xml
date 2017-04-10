@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2009-2016 the original author or authors. Licensed under the 
+	Apache License, Version 2.0 (the "License"); you may not use this file except 
+	in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+	Unless required by applicable law or agreed to in writing, software distributed 
+	under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+	OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+	the specific language governing permissions and limitations under the License. -->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.sunny.DAO.MessageInterface">
+
+	<resultMap type="com.sunny.bean.Message" id="MessageResult">
+		<!-- id标签对应的是数据库中的主键 -->
+		<id column="ID" jdbcType="INTEGER" property="id" />
+		<result column="COMMAND" jdbcType="VARCHAR" property="command" />
+		<result column="DESCRIPTION" jdbcType="VARCHAR" property="description" />
+		<result column="CONTENT" jdbcType="VARCHAR" property="content" />
+	</resultMap>
+
+	<select id="queryMessageList" parameterType="com.sunny.bean.Message"
+		resultMap="MessageResult">
+		select
+		<include refid="columns" />
+		from message
+		<where>
+			<if test="command!=null&amp;&amp;!&quot;&quot;.equals(message.command.trim())">
+				and COMMAND=#{command}
+			</if>
+			<if test="description!=null&amp;&amp;!&quot;&quot;.equals(message.description.trim())">
+				and DESCRIPTION like '%' #{description} '%'</if>
+		</where>
+		order by ID
+	</select>
+	
+	<select id="queryMessageListByPage" parameterType="java.util.HashMap"
+		resultMap="MessageResult">
+		select
+		<include refid="columns" />
+		from message
+		<where>
+			<if test="message.command!=null&amp;&amp;!&quot;&quot;.equals(message.command.trim())">
+				and COMMAND=#{message.command}
+			</if>
+			<if test="message.description!=null&amp;&amp;!&quot;&quot;.equals(message.description.trim())">
+				and DESCRIPTION like '%' #{message.description} '%'</if>
+		</where>
+		order by ID
+	</select>
+	
+	<select id="countQueryItemNum" parameterType="com.sunny.bean.Message"
+		resultType="int">
+		select count(*) from message
+		<where>
+			<if test="command!=null&amp;&amp;!&quot;&quot;.equals(command.trim())">
+				and COMMAND=#{command}
+			</if>
+			<if test="description!=null&amp;&amp;!&quot;&quot;.equals(description.trim())">
+				and DESCRIPTION like '%' #{description} '%'</if>
+		</where>
+	</select>
+	
+	<sql id="columns">ID,COMMAND,DESCRIPTION,CONTENT</sql>
+	<!-- 完成单条删除功能，使用delete标签,parameterType -->
+	<delete id="deleteOne" parameterType="int">
+		DELETE FROM message WHERE ID = #{_parameter}
+	</delete>
+	<!-- 完成批量删除的功能，批量存储使用List -->
+	<delete id="deleteBatch" parameterType="java.util.List">
+		DELETE FROM message WHERE ID in(
+		<foreach collection="list" item="item" separator=",">
+			#{item}
+		</foreach>
+		)
+	</delete>
+
+	<insert id="insertOne" parameterType="com.sunny.bean.Message">
+		INSERT INTO message
+		( ID, COMMAND, DESCRIPTION, CONTENT)
+		VALUES
+		( #{id},#{command},#{description},#{content})
+	</insert>
+	
+	<update id="updateOne" parameterType="com.sunny.bean.Message">
+		UPDATE message SET
+			COMMAND=#{command}
+			DESCRIPTION=#{description}
+			CONTENT=#{content}
+		WHERE
+		ID=#{id}
+	</update>
+
+<!--   <select id="version" parameterType="long" resultType="int"> -->
+<!--     SELECT version FROM user WHERE id = #{id,jdbcType=INTEGER} -->
+<!--   </select> -->
+
+<!--   <delete id="delete" parameterType="UserAlias"> -->
+<!--     DELETE FROM user WHERE id = #{id:INTEGER} -->
+<!--   </delete> -->
+
+<!--   <insert id="insert" parameterType="UserAlias" useGeneratedKeys="false"> -->
+<!--     INSERT INTO user -->
+<!--     ( id, -->
+<!--     username, -->
+<!--     password, -->
+<!--     administrator -->
+<!--     ) -->
+<!--     VALUES -->
+<!--     ( #{id}, -->
+<!--     #{username,jdbcType=VARCHAR}, -->
+<!--     #{password.encrypted:VARCHAR}, -->
+<!--     #{administrator,jdbcType=BOOLEAN} -->
+<!--     ) -->
+<!--   </insert> -->
+
+<!--   <update id="update" parameterType="UserAlias"> -->
+<!--     UPDATE user SET -->
+<!--     username = #{username,jdbcType=VARCHAR}, -->
+<!--     password = #{password.encrypted,jdbcType=VARCHAR}, -->
+<!--     administrator = #{administrator,jdbcType=BOOLEAN} -->
+<!--     WHERE -->
+<!--     id = #{id,jdbcType=INTEGER} -->
+<!--   </update> -->
+
+  <!--   Unique constraint check -->
+<!--   <select id="isUniqueUsername" parameterType="map" resultType="boolean"> -->
+<!--     SELECT (count(*) = 0) -->
+<!--     FROM user -->
+<!--     WHERE ((#{userId,jdbcType=BIGINT} IS NOT NULL AND id != #{userId,jdbcType=BIGINT}) OR #{userId,jdbcType=BIGINT} IS -->
+<!--     NULL)  other than me -->
+<!--     AND (username = #{username,jdbcType=VARCHAR}) -->
+<!--   </select> -->
+</mapper>
